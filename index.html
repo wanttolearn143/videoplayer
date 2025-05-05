@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>No Flash Video Player</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+    #player-container {
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      visibility: hidden; /* Start hidden */
+    }
+    #video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    #placeholder {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      color: #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: sans-serif;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="placeholder">Loading video...</div>
+  <div id="player-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script>
+    const placeholder = document.getElementById('placeholder');
+    const container = document.getElementById('player-container');
+    const videoSrc = 'https://luminous-rabanadas-ecb5ac.netlify.app/stream.php?url=https://sdqm.vivianorov.sbs/k5/9orncb/master.txt'; // Your video
+
+    const video = document.createElement('video');
+    video.id = 'video';
+    video.autoplay = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'auto';
+    // video.controls = true; // Optional: Add this if you want controls
+
+    container.appendChild(video);
+
+    function showPlayer() {
+      placeholder.style.display = 'none';
+      container.style.visibility = 'visible';
+    }
+
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = videoSrc;
+      video.addEventListener('loadedmetadata', showPlayer);
+    } else if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(videoSrc);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, showPlayer);
+    } else {
+      video.src = videoSrc;
+      video.addEventListener('loadedmetadata', showPlayer);
+    }
+  </script>
+</body>
+</html>
